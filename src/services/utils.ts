@@ -1,7 +1,7 @@
 export async function request<T>(
-  input: RequestInfo | URL,
-  init?: RequestInit
+  path: RequestInfo | URL,
+  options?: RequestInit
 ): Promise<T> {
-  const response = await fetch(input, init);
+  const response = await fetch(path, options);
   return await response.json();
 }

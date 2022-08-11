@@ -32,3 +32,5 @@ export interface IImagePyramidEntry {
   name: string;
   factor: number;
 }
+
+export interface IDefinitions {}
