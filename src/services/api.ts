@@ -1,22 +1,23 @@
-import { API_ROOT_PATH, LOCALE, ROOT_PATH, X_API_KEY } from "./constants";
-import { IDefinitions, IDestinyManifest, IResponse } from "./types";
-import { request } from "./utils";
+import {
+  getDestinyManifest,
+  getDestinyManifestSlice,
+  HttpClientConfig,
+} from "bungie-api-ts/destiny2";
+import { LOCALE } from "./constants";
+import { DestinyDefinition } from "./types";
 
-export function destiny<T>(path: string, options?: RequestInit) {
-  const url = `${API_ROOT_PATH}${path}`;
-  const headers = new Headers({ "X-API-Key": X_API_KEY });
-  return request<IResponse<T>>(url, { ...options, headers });
+export async function client(config: HttpClientConfig) {
+  const options = { method: config.method };
+  const response = await fetch(config.url, options);
+  return await response.json();
 }
 
-export async function getDestinyManifest() {
-  const method = "GET";
-  const path = "/Destiny2/Manifest/";
-  const value = await destiny<IDestinyManifest>(path, { method });
-  return value.Response;
-}
-
-export function getDefinitions(manifest: IDestinyManifest) {
-  const path = manifest.jsonWorldContentPaths[LOCALE];
-  const url = `${ROOT_PATH}${path}`;
-  return request<IDefinitions>(url);
+export async function getDefinitions() {
+  const manifest = await getDestinyManifest(client);
+  const tables = await getDestinyManifestSlice(client, {
+    destinyManifest: manifest.Response,
+    tableNames: Object.values(DestinyDefinition),
+    language: LOCALE,
+  });
+  return tables;
 }
